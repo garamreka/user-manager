@@ -1,5 +1,7 @@
-﻿using MongoDB.Bson;
+﻿using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using UserManager.Api.Configurations;
 using UserManager.Api.Models;
 
 namespace UserManager.Api.Repositories
@@ -8,10 +10,12 @@ namespace UserManager.Api.Repositories
     {
         private readonly IMongoCollection<User> _users;
 
-        public UserRepository(IMongoClient client)
+        public UserRepository(
+            IMongoClient client,
+            IOptions<UserManagerDatabaseConfiguration> configuration)
         {
-            var database = client.GetDatabase("UserManagerDb");
-            _users = database.GetCollection<User>("User");
+            var database = client.GetDatabase(configuration.Value.DatabaseName);
+            this._users = database.GetCollection<User>(configuration.Value.CollectionName);
         }
 
         public async Task<string> AddUser(User user)

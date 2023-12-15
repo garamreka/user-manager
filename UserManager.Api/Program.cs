@@ -1,9 +1,16 @@
 using MongoDB.Driver;
+using UserManager.Api.Configurations;
 using UserManager.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+IConfigurationRoot configuration = new ConfigurationBuilder()
+           .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+           .AddJsonFile("appsettings.json")
+           .Build();
+
+var userManagerDatabaseConfigurationSection = configuration.GetSection("UserManagerDatabase");
+builder.Services.Configure<UserManagerDatabaseConfiguration>(userManagerDatabaseConfigurationSection);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -11,12 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
-IConfigurationRoot configuration = new ConfigurationBuilder()
-           .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-           .AddJsonFile("appsettings.json")
-           .Build();
-
-var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDb"));
+var mongoClient = new MongoClient(userManagerDatabaseConfigurationSection.GetValue<string>("ConnectionString"));
 builder.Services.AddSingleton<IMongoClient>(mongoClient);
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
