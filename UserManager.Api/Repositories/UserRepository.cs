@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using UserManager.Api.Models;
 
 namespace UserManager.Api.Repositories
@@ -13,29 +14,35 @@ namespace UserManager.Api.Repositories
             _users = database.GetCollection<User>("User");
         }
 
-        public Task<bool> AddUser(User user)
+        public async Task<string> AddUser(User user)
         {
-            throw new NotImplementedException();
+            await _users.InsertOneAsync(user);
+
+            return user.Id.ToString();
         }
 
-        public Task<bool> DeleteUserById(string id)
+        public async Task<bool> DeleteUserById(ObjectId id)
         {
-            throw new NotImplementedException();
+            var result = await _users.DeleteOneAsync(x => x.Id == id);
+
+            return result.DeletedCount == 1;
         }
 
-        public Task<List<User>> GetAllUsers()
+        public async Task<IEnumerable<User>> GetAllUsers()
         {
-            throw new NotImplementedException();
+            return await _users.Find(_ => true).ToListAsync();
         }
 
-        public Task<User> GetUserById(string id)
+        public async Task<User> GetUserById(ObjectId id)
         {
-            throw new NotImplementedException();
+            return await _users.Find(x => x.Id == id).FirstOrDefaultAsync();
         }
 
-        public Task<bool> UpdateUser(string id, User user)
+        public async Task<bool> UpdateUser(ObjectId id, User user)
         {
-            throw new NotImplementedException();
+            var result = await _users.ReplaceOneAsync(x => x.Id == id, user);
+
+            return result.ModifiedCount == 1;
         }
     }
 }
