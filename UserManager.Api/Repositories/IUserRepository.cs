@@ -9,7 +9,7 @@ namespace UserManager.Api.Repositories
 
         Task<User> GetUserById(ObjectId id);
 
-        Task<string> AddUser(User user);
+        Task<ObjectId> AddUser(User user);
 
         Task<bool> UpdateUser(ObjectId id, User user);
 

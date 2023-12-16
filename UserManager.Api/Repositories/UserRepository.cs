@@ -18,11 +18,11 @@ namespace UserManager.Api.Repositories
             this._users = database.GetCollection<User>(configuration.Value.CollectionName);
         }
 
-        public async Task<string> AddUser(User user)
+        public async Task<ObjectId> AddUser(User user)
         {
             await _users.InsertOneAsync(user);
 
-            return user.Id.ToString();
+            return user.Id;
         }
 
         public async Task<bool> DeleteUserById(ObjectId id)
