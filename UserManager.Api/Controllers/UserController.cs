@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using UserManager.Api.Models;
-using UserManager.Api.Repositories;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
+using UserManager.Api.DTOs;
+using UserManager.Api.Services;
 
 namespace UserManager.Api.Controllers
 {
@@ -9,54 +11,93 @@ namespace UserManager.Api.Controllers
     [ApiController]
     public class UserController : Controller
     {
-        private readonly IUserRepository _userRepository;
-        public UserController(IUserRepository userRepository)
+        private readonly IUserService _userService;
+        public UserController(IUserService userService)
         {
-            this._userRepository = userRepository;       
+            this._userService = userService;       
         }
 
+        /// <summary>
+        /// Get all users
+        /// </summary>
+        /// <returns>The users</returns>
         [HttpGet]
+        [SwaggerResponse((int)HttpStatusCode.OK)]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _userRepository.GetAllUsers();
+            var users = await _userService.GetAllUsers();
             return Ok(users);
         }
 
+        /// <summary>
+        /// Get user by id
+        /// </summary>
+        /// <param name="id">String representation of the ObjectId</param>
+        /// <returns>The user</returns>
         [HttpGet]
         [Route("{id:length(24)}")]
+        [SwaggerResponse((int)HttpStatusCode.OK)]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "User was not found, no changes were made in the database")]
+        [Authorize]
         public async Task<IActionResult> GetById(string id)
         {
-            var user = await _userRepository.GetUserById(ObjectId.Parse(id));
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
+            var user = await _userService.GetUserById(id);
             return Ok(user);
         }
 
-        
+        /// <summary>
+        /// Creates a new user
+        /// </summary>
+        /// <param name="user">The user to be created</param>
+        /// <returns>The string representation of the user's ObjectId</returns>
         [HttpPost]
-        public async Task<IActionResult> Create(User user)
+        [SwaggerResponse((int)HttpStatusCode.OK)]
+        [Authorize]
+        public async Task<IActionResult> Create(NewUserDto user)
         {
-            var id = await _userRepository.AddUser(user);
+            var id = await _userService.AddUser(user);
             return Ok(id);
         }
 
+        /// <summary>
+        /// Updates the user
+        /// </summary>
+        /// <param name="user">The user to be updated</param>
+        /// <returns>The status code</returns>
         [HttpPut]
-        public async Task<IActionResult> Update(User user)
+        [SwaggerResponse((int)HttpStatusCode.OK)]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "User was not found, no changes were made in the database")]
+        [Authorize]
+        public async Task<IActionResult> Update(UserDto user)
         {
-            var success = await _userRepository.UpdateUser(user.Id, user);
-            return success ? Ok() : NotFound();
+            try
+            {
+                await _userService.UpdateUser(user.Id, user);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            
         }
 
+        /// <summary>
+        /// Deletes the user
+        /// </summary>
+        /// <param name="id">The string representation of the user's ObjectId</param>
+        /// <returns>The status code</returns>
         [HttpDelete]
         [Route("{id:length(24)}")]
+        [SwaggerResponse((int)HttpStatusCode.NoContent, "User was successfully deleted and resource is no longer available")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "User was not found, no changes were made in the database")]
+        [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
-            var success = await _userRepository.DeleteUserById(ObjectId.Parse(id));
-            return success ? NoContent() : NotFound();
+            await _userService.DeleteUserById(id);
+            return NoContent();
         }
     }
 }
