@@ -18,7 +18,7 @@ namespace UserManager.Api.Controllers
         }
 
         /// <summary>
-        /// Get all users
+        /// Gets all users
         /// </summary>
         /// <returns>The users</returns>
         [HttpGet]
@@ -31,7 +31,7 @@ namespace UserManager.Api.Controllers
         }
 
         /// <summary>
-        /// Get user by id
+        /// Gets user by id
         /// </summary>
         /// <param name="id">String representation of the ObjectId</param>
         /// <returns>The user</returns>
@@ -71,17 +71,8 @@ namespace UserManager.Api.Controllers
         [Authorize]
         public async Task<IActionResult> Update(UserDto user)
         {
-            try
-            {
-                await _userService.UpdateUser(user.Id, user);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-            
+            await _userService.UpdateUser(user.Id, user);
+            return Ok();
         }
 
         /// <summary>
