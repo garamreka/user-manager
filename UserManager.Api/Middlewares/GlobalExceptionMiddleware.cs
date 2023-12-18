@@ -40,13 +40,6 @@ namespace UserManager.Api.Middlewares
                         Message = "The requested resource was not found."
                     };
                     break;
-                case UnauthorizedAccessException:
-                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    error = new Error
-                    {
-                        Message = "You are not authorized to access this resource."
-                    };
-                    break;
                 case InvalidOperationException:
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     error = new Error
@@ -54,18 +47,10 @@ namespace UserManager.Api.Middlewares
                         Message = "The request is invalid."
                     };
                     break;
-                case ValidationException:
-                    error = new Error
-                    {
-                        StatusCode = (int)HttpStatusCode.BadRequest,
-                        Message = $"The request is invalid. {((ValidationException)exception).Message}"
-                    };
-                    break;
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     error = new Error
                     {
-                        StatusCode = (int)HttpStatusCode.InternalServerError,
                         Message = "An error occurred while processing your request. Please try again later."
                     };
                     break;
