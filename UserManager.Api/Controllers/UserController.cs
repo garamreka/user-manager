@@ -23,6 +23,7 @@ namespace UserManager.Api.Controllers
         /// <returns>The users</returns>
         [HttpGet]
         [SwaggerResponse((int)HttpStatusCode.OK)]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         [Authorize]
         public async Task<IActionResult> GetAll()
         {
@@ -38,6 +39,8 @@ namespace UserManager.Api.Controllers
         [HttpGet]
         [Route("{id:length(24)}")]
         [SwaggerResponse((int)HttpStatusCode.OK)]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "User was not found, no changes were made in the database")]
         [Authorize]
         public async Task<IActionResult> GetById(string id)
@@ -53,6 +56,8 @@ namespace UserManager.Api.Controllers
         /// <returns>The string representation of the user's ObjectId</returns>
         [HttpPost]
         [SwaggerResponse((int)HttpStatusCode.OK)]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [Authorize]
         public async Task<IActionResult> Create(NewUserDto user)
         {
@@ -67,6 +72,8 @@ namespace UserManager.Api.Controllers
         /// <returns>The status code</returns>
         [HttpPut]
         [SwaggerResponse((int)HttpStatusCode.OK)]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "User was not found, no changes were made in the database")]
         [Authorize]
         public async Task<IActionResult> Update(UserDto user)
@@ -83,6 +90,8 @@ namespace UserManager.Api.Controllers
         [HttpDelete]
         [Route("{id:length(24)}")]
         [SwaggerResponse((int)HttpStatusCode.NoContent, "User was successfully deleted and resource is no longer available")]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "User was not found, no changes were made in the database")]
         [Authorize]
         public async Task<IActionResult> Delete(string id)
