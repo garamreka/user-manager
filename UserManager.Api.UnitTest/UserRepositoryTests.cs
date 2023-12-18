@@ -5,22 +5,19 @@ using MongoDB.Driver;
 using UserManager.Api.Configurations;
 using UserManager.Api.Models;
 using UserManager.Api.Repositories;
-using Xunit.Abstractions;
 
 namespace UserManager.Api.UnitTest
 {
     public class UserRepositoryTests : IClassFixture<MongoDbFixture>
     {
         private readonly Fixture _fixture;
-        private readonly ITestOutputHelper _output;
         private readonly IMongoCollection<User> _userCollection;
         private readonly UserRepository _userRepository;
         private readonly IOptions<UserManagerDatabaseConfiguration> _configuration;
 
-        public UserRepositoryTests(MongoDbFixture fixture, ITestOutputHelper output)
+        public UserRepositoryTests(MongoDbFixture fixture)
         {
             _fixture = new Fixture();
-            _output = output;
             _userCollection = fixture.Database.GetCollection<User>("users");
             _configuration = Options.Create(fixture.DatabaseConfig);
             _userRepository = new UserRepository(fixture.Client, _configuration);
