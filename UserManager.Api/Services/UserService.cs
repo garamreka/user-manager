@@ -28,7 +28,12 @@ namespace UserManager.Api.Services
 
         public async Task DeleteUserById(string id)
         {
-            var success = await _userRepository.DeleteUserById(ObjectId.Parse(id));
+            if (string.IsNullOrWhiteSpace(id) || !ObjectId.TryParse(id, out ObjectId objectId))
+            {
+                throw new InvalidOperationException();
+            }
+
+            var success = await _userRepository.DeleteUserById(objectId);
 
             if (!success)
             {
@@ -44,20 +49,25 @@ namespace UserManager.Api.Services
 
         public async Task<UserDto> GetUserById(string id)
         {
-            var user = await _userRepository.GetUserById(ObjectId.Parse(id));
-
-            if (user is null)
+            if (string.IsNullOrWhiteSpace(id) || !ObjectId.TryParse(id, out ObjectId objectId))
             {
-                throw new NotFoundException();
+                throw new InvalidOperationException();
             }
 
-            return _mapper.Map<UserDto>(user);
+            var user = await _userRepository.GetUserById(objectId);
+
+            return user is null ? throw new NotFoundException() : _mapper.Map<UserDto>(user);
         }
 
         public async Task UpdateUser(string id, UserDto user)
         {
+            if (string.IsNullOrWhiteSpace(id) || !ObjectId.TryParse(id, out ObjectId objectId))
+            {
+                throw new InvalidOperationException();
+            }
+
             var userToUpdate = _mapper.Map<User>(user);
-            var success = await _userRepository.UpdateUser(ObjectId.Parse(id), userToUpdate);
+            var success = await _userRepository.UpdateUser(objectId, userToUpdate);
 
             if (!success)
             {
