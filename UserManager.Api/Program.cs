@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using System.Reflection;
 using UserManager.Api.Authentication;
 using UserManager.Api.Configurations;
 using UserManager.Api.Middlewares;
@@ -54,6 +55,9 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
     options.EnableAnnotations();
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
